@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Secure S3 bucket with KMS encryption
+
+Resources:
+
+  MyKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: KMS key for encrypting objects in the secure S3 bucket
+      Enabled: true
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: key-default-1
+        Statement:
+          - Sid: AllowRootAccount
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: "kms:*"
+            Resource: "*"
+
+  MyKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: alias/secure-s3-key
+      TargetKeyId: !Ref MyKmsKey
+
+  SecureS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub secure-s3-${AWS::AccountId}-${AWS::Region}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !Ref MyKmsKey
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+Outputs:
+
+  BucketName:
+    Description: The name of the secure S3 bucket
+    Value: !Ref SecureS3Bucket
+
+  KmsKeyArn:
+    Description: The ARN of the KMS key used for bucket encryption
+    Value: !GetAtt MyKmsKey.Arn
