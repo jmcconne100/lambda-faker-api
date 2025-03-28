@@ -6,10 +6,11 @@ A fully containerized AWS Lambda function using Python 3.11, Faker, Boto3, and S
 - AWS Lambda container image (Python 3.11)
 - Faker-generated user and company data
 - Secure data writes to S3 (KMS-encrypted)
-- CI/CD pipeline with CodePipeline and CodeBuild
+- CI/CD pipeline with CodePipeline
 - Image artifacts stored in ECR
-- Auto-build on GitHub push
+- Manual build in CodePipeline
 - Infrastructure defined in CloudFormation
+- IAM roles defined in JSON
 
 # Architecture
 
@@ -36,7 +37,7 @@ This project uses AWS Lambda containers, CodePipeline, and S3 with KMS encryptio
 
 ### Prerequisites
 
-- AWS Account with permissions for Lambda, ECR, S3, KMS, IAM, CodePipeline, and CodeBuild
+- AWS Account with permissions for Lambda, ECR, S3, KMS, IAM, and CodePipeline
 - GitHub repo with this code
 - A working GitHub → CodePipeline connection
 
